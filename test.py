@@ -22,7 +22,8 @@ class FallingObject:
         self.color = colors[obj_type]
         self.x = random.randint(0, WIDTH - self.size)
         self.y = -self.size
-        self.speed = [2, 1.5, 1][obj_type]  # Скорость падения
+        self.speed = [3, 2.5, 2][obj_type]  # Скорость падения
+        self.obj_type = obj_type  # Сохраняем тип объекта
 
     def fall(self):
         self.y += self.speed
@@ -51,12 +52,16 @@ class Player:
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, (self.x, self.y, self.size, self.size))
 
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.size, self.size)
+
 
 # Основной игровой цикл
 def main():
     clock = pygame.time.Clock()
     falling_objects = []
     player = Player()
+    score = 0  # Начальный счет
 
     running = True
     while running:
@@ -75,14 +80,29 @@ def main():
             obj_type = random.randint(0, 2)  # 0 - большой, 1 - средний, 2 - маленький
             falling_objects.append(FallingObject(obj_type))
 
-        # Обновляем позиции объектов
+        # Обновляем позиции объектов и проверяем на столкновение с игроком
         for obj in falling_objects:
             obj.fall()
+
+            # Проверяем на столкновение
+            if player.get_rect().colliderect(
+                pygame.Rect(obj.x, obj.y, obj.size, obj.size)
+            ):
+                if obj.obj_type == 0:  # Большой объект
+                    score -= 1
+                elif obj.obj_type == 1:  # Средний объект
+                    score += 2
+                elif obj.obj_type == 2:  # Маленький объект
+                    score += 1
+
+                # Удаляем объект после столкновения
+                falling_objects.remove(obj)
 
         # Удаляем объекты, которые вышли за границы экрана
         falling_objects = [obj for obj in falling_objects if obj.y < HEIGHT]
 
         # Очистка экрана
+
         window.fill((255, 255, 255))  # Устанавливаем белый фон
 
         # Рисуем все падающие объекты
@@ -91,6 +111,11 @@ def main():
 
         # Рисуем управляемый объект
         player.draw(window)
+
+        # Отображаем счет
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+        window.blit(score_text, (10, 10))  # Размещение счёта в верхнем левом углу
 
         # Обновляем экран
         pygame.display.flip()
