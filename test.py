@@ -22,7 +22,7 @@ class FallingObject:
         self.color = colors[obj_type]
         self.x = random.randint(0, WIDTH - self.size)
         self.y = -self.size
-        self.speed = [3, 2.5, 2][obj_type]  # Скорость падения
+        self.speed = [2, 1.5, 1][obj_type]  # Скорость падения
         self.obj_type = obj_type  # Сохраняем тип объекта
 
     def fall(self):
@@ -89,7 +89,7 @@ def main():
                 pygame.Rect(obj.x, obj.y, obj.size, obj.size)
             ):
                 if obj.obj_type == 0:  # Большой объект
-                    score -= 1
+                    score -= 2
                 elif obj.obj_type == 1:  # Средний объект
                     score += 2
                 elif obj.obj_type == 2:  # Маленький объект
@@ -114,7 +114,7 @@ def main():
 
         # Отображаем счет
         font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+        score_text = font.render(f"Счет: {score}", True, (0, 0, 0))
         window.blit(score_text, (10, 10))  # Размещение счёта в верхнем левом углу
 
         # Обновляем экран
