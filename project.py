@@ -22,7 +22,7 @@ class FallingObject:
         self.color = colors[obj_type]
         self.x = random.randint(0, WIDTH - self.size)
         self.y = -self.size
-        self.speed = [2, 1.5, 1][obj_type]  # Скорость падения
+        self.speed = [3, 2.5, 2][obj_type]  # Скорость падения
         self.obj_type = obj_type  # Сохраняем тип объекта
 
     def fall(self):
