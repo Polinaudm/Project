@@ -17,12 +17,14 @@ max_objects = 5  # Максимальное количество падающи�
 # Класс для падающих объектов
 class FallingObject:
     def __init__(self, obj_type):
-        sizes = [80, 50, 30]  # Большой, Средний, Маленький
+        sizes = [80, 50, 30]  # Размеры объектов: Большой, Средний, Маленький
         self.size = sizes[obj_type]
         self.color = colors[obj_type]
         self.x = random.randint(0, WIDTH - self.size)
         self.y = -self.size
-        self.speed = [3, 2.5, 2][obj_type]  # Скорость падения
+
+        # Увеличиваем скорость падения объектов
+        self.speed = [3, 2.5, 2][obj_type]  # Скорость падения: увеличена
         self.obj_type = obj_type  # Сохраняем тип объекта
 
     def fall(self):
@@ -64,58 +66,86 @@ def main():
     score = 0  # Начальный счет
 
     running = True
+    game_over = False  # Флаг, указывающий, окончена ли игра
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:  # Движение влево
-            player.move(-player.speed)
-        if keys[pygame.K_d]:  # Движение вправо
-            player.move(player.speed)
+        if not game_over:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_a]:  # Движение влево
+                player.move(-player.speed)
+            if keys[pygame.K_d]:  # Движение вправо
+                player.move(player.speed)
 
-        # Добавляем новый объект только если их меньше максимального количества
-        if len(falling_objects) < max_objects and random.randint(1, 30) == 1:
-            obj_type = random.randint(0, 2)  # 0 - большой, 1 - средний, 2 - маленький
-            falling_objects.append(FallingObject(obj_type))
+            # Добавляем новый объект только если их меньше максимального количества
+            if len(falling_objects) < max_objects and random.randint(1, 30) == 1:
+                obj_type = random.randint(
+                    0, 2
+                )  # 0 - большой, 1 - средний, 2 - маленький
+                falling_objects.append(FallingObject(obj_type))
 
-        # Обновляем позиции объектов и проверяем на столкновение с игроком
-        for obj in falling_objects:
-            obj.fall()
+            # Обновляем позиции объектов и проверяем на столкновение с игроком
+            for obj in falling_objects:
+                obj.fall()
 
-            # Проверяем на столкновение
-            if player.get_rect().colliderect(
-                pygame.Rect(obj.x, obj.y, obj.size, obj.size)
-            ):
-                if obj.obj_type == 0:  # Большой объект
-                    score -= 2
-                elif obj.obj_type == 1:  # Средний объект
-                    score += 2
-                elif obj.obj_type == 2:  # Маленький объект
-                    score += 1
+                # Проверяем на столкновение
+                if player.get_rect().colliderect(
+                    pygame.Rect(obj.x, obj.y, obj.size, obj.size)
+                ):
+                    if obj.obj_type == 0:  # Большой объект
+                        score -= 1
+                    elif obj.obj_type == 1:  # Средний объект
+                        score += 2
+                    elif obj.obj_type == 2:  # Маленький объект
+                        score += 1
 
-                # Удаляем объект после столкновения
-                falling_objects.remove(obj)
+                    # Удаляем объект после столкновения
 
-        # Удаляем объекты, которые вышли за границы экрана
-        falling_objects = [obj for obj in falling_objects if obj.y < HEIGHT]
+                    falling_objects.remove(obj)
 
-        # Очистка экрана
+            # Проверяем, не достиг ли счет отрицательных значений
+            if score < 0:
+                game_over = True  # Устанавливаем флаг окончания игры
 
-        window.fill((255, 255, 255))  # Устанавливаем белый фон
+            # Удаляем объекты, которые вышли за границы экрана
+            falling_objects = [obj for obj in falling_objects if obj.y < HEIGHT]
 
-        # Рисуем все падающие объекты
-        for obj in falling_objects:
-            obj.draw(window)
+            # Очистка экрана
+            window.fill((255, 255, 255))  # Устанавливаем белый фон
 
-        # Рисуем управляемый объект
-        player.draw(window)
+            # Рисуем все падающие объекты
+            for obj in falling_objects:
+                obj.draw(window)
 
-        # Отображаем счет
-        font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Счет: {score}", True, (0, 0, 0))
-        window.blit(score_text, (10, 10))  # Размещение счёта в верхнем левом углу
+            # Рисуем управляемый объект
+            player.draw(window)
+
+            # Отображаем счет
+            font = pygame.font.Font(None, 36)
+            score_text = font.render(f"Счет: {score}", True, (0, 0, 0))
+            window.blit(score_text, (10, 10))  # Размещение счета в верхнем левом углу
+
+        else:
+            # Отображение текста "Game Over!" с меньшим размером шрифта
+            font = pygame.font.Font(None, 48)  # Уменьшен размер шрифта
+            game_over_text = font.render("Game Over!", True, (255, 0, 0))
+            text_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 3))
+            window.blit(game_over_text, text_rect)
+
+            # Отображение текста "Нажмите пробел чтобы начать заново" с меньшим размером шрифта
+            restart_text = font.render(
+                "Нажмите SPACE чтобы начать заново", True, (0, 0, 0)
+            )
+            restart_rect = restart_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            window.blit(restart_text, restart_rect)
+
+            # Проверяем нажатие пробела для перезапуска игры
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                main()  # Запуск новой игры
 
         # Обновляем экран
         pygame.display.flip()
