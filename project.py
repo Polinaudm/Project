@@ -1,5 +1,7 @@
 import pygame
 import random
+import os
+import sys
 
 # Инициализация Pygame
 pygame.init()
@@ -10,8 +12,19 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Падающие объекты")
 
 # Определяем цвета для каждого типа объекта
-colors = [(255, 0, 0), (0, 0, 255), (0, 255, 0)]  # Красный, Синий, Зеленый
-max_objects = 5  # Максимальное количество падающих объектов на экране
+COLORS = [(255, 0, 0), (0, 0, 255), (0, 255, 0)]  # Красный, Синий, Зеленый
+MAX_OBJECTS = 5  # Максимальное количество падающих объектов на экране
+
+
+def load_image(name, colorkey=None):
+    # функция для загрузки картинок из папки data
+    fullname = os.path.join('data', name)
+    # если файл не существует, то выходим
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    return image
 
 
 # Класс для падающих объектов
@@ -19,7 +32,7 @@ class FallingObject:
     def __init__(self, obj_type):
         sizes = [80, 50, 30]  # Размеры объектов: Большой, Средний, Маленький
         self.size = sizes[obj_type]
-        self.color = colors[obj_type]
+        self.color = COLORS[obj_type]
         self.x = random.randint(0, WIDTH - self.size)
         self.y = -self.size
 
@@ -81,7 +94,7 @@ def main():
                 player.move(player.speed)
 
             # Добавляем новый объект только если их меньше максимального количества
-            if len(falling_objects) < max_objects and random.randint(1, 30) == 1:
+            if len(falling_objects) < MAX_OBJECTS and random.randint(1, 30) == 1:
                 obj_type = random.randint(
                     0, 2
                 )  # 0 - большой, 1 - средний, 2 - маленький
@@ -93,7 +106,7 @@ def main():
 
                 # Проверяем на столкновение
                 if player.get_rect().colliderect(
-                    pygame.Rect(obj.x, obj.y, obj.size, obj.size)
+                        pygame.Rect(obj.x, obj.y, obj.size, obj.size)
                 ):
                     if obj.obj_type == 0:  # Большой объект
                         score -= 1
