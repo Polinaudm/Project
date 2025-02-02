@@ -351,10 +351,10 @@ def main():
 
                 # Проверяем, не достиг ли счет отрицательных значений
                 if score < 0 or level_g == 4:
-                    game_over = True  # Устанавливаем флаг окончания игрыфффффв
+                    game_over = True  # Устанавливаем флаг окончания игры
 
                 # Проверяем достижение счета 30 для победы
-                if score >= 5:
+                if score >= 30:
                     raznica = current_time - time_start
                     vr = str(raznica.seconds) + "." + str(raznica.microseconds)[:2]
                     print(f"{raznica.seconds}:{raznica.microseconds}", level_g)
@@ -368,9 +368,6 @@ def main():
                             WHERE nick = ?""",
                         (player_nick,),
                     )
-                    # cursor.execute(
-                    #     f"""UPDATE leaders_list SET level_{level} = ? WHERE nick = ?""",
-                    #     (vr, player_nick, ))
                     conn.commit()
                     player_win = True  # Устанавливаем флаг победы
                     level_g += 1
@@ -427,7 +424,7 @@ def main():
                     level_g = 1
 
                 elif player_win or level_g == 4:
-                    # Отображение текста "Вы победили!" с первоначальным размером шрифта
+                    # Отображение текста "Поздравляем, игра пройдена!"
                     font_3 = pygame.font.Font(None, 74)  # Оставляем размер шрифта 74
                     text_2 = ""
                     rst_text = ""
@@ -438,7 +435,7 @@ def main():
                         text_2 = "Вы прошли второй уровень!"
                         rst_text = "Нажмите пробел чтобы запустить следующий уровень"
                     elif level_g == 4:
-                        text_2 = "Вы победили!"
+                        text_2 = "Поздравляем, игра пройдена!"
                         nick = ""
                         pygame.draw.rect(window, (0, 0, 255), button_rect)
                         window.blit(
@@ -448,7 +445,7 @@ def main():
                     text_rect = win_text.get_rect(center=(WIDTH // 2, HEIGHT // 3))
                     window.blit(win_text, text_rect)
 
-                    # Отображение текста "Нажмите пробел чтобы начать заново" с уменьшенным размером шрифта
+                    # Отображение текста "Нажмите пробел чтобы начать заново"
                     smaller_font = pygame.font.Font(
                         None, 36
                     )  # Уменьшаем размер шрифта для второго текста
