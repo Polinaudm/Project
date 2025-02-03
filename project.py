@@ -93,7 +93,6 @@ class FallingObject:
             self.y += self.speed * 1.5
         elif lvl == 3:
             self.y += self.speed * 2
-        print(lvl, level)
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))  # Рисуем изображение
@@ -269,13 +268,10 @@ def main():
                 if (
                     keys[pygame.K_RETURN] and nick != ""
                 ):  # Проверяем нажатие клавиши Enter
-                    # show_input = False
-                    print(f"Имя: {nick}")
                     nicks = cursor.execute(
                         """SELECT nick FROM leaders_list"""
                     ).fetchall()
                     nicks = list(map(ret_zero, nicks))
-                    print(nicks)
                     if nick not in nicks and len(nick) > 0:
                         cursor.execute(
                             """INSERT INTO leaders_list (nick) VALUES (?)""", (nick,)
@@ -357,7 +353,6 @@ def main():
                 if score >= 30:
                     raznica = current_time - time_start
                     vr = str(raznica.seconds) + "." + str(raznica.microseconds)[:2]
-                    print(f"{raznica.seconds}:{raznica.microseconds}", level_g)
                     cursor.execute(
                         f"""UPDATE leaders_list 
                             SET level_{level_g} = CASE
